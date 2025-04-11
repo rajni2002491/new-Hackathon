@@ -35,119 +35,266 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dummy user data
-    final user = {
-      'name': 'John Doe',
-      'role': 'Builder',
-      'bio': 'Passionate about creating innovative solutions',
-      'skills': ['Flutter', 'React', 'Node.js', 'UI/UX Design'],
-      'projects': ['E-commerce App', 'Portfolio Website'],
-      'socialLinks': {
-        'GitHub': 'github.com/johndoe',
-        'LinkedIn': 'linkedin.com/in/johndoe',
-      },
-    };
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const EditProfileScreen(),
-                ),
-              );
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.secondary,
+            ],
           ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _handleLogout(context),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Column(
-                children: [
-                  const CircleAvatar(
-                    radius: 50,
-                    child: Icon(Icons.person, size: 50),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    user['name']?.toString() ?? 'No Name',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    user['role']?.toString() ?? 'No Role',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text('About', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Text(
-              user['bio']?.toString() ?? 'No Bio Available',
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Text('Skills', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children:
-                  (user['skills'] as List<String>)
-                      .map(
-                        (skill) => Chip(
-                          label: Text(skill),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primaryContainer,
-                        ),
-                      )
-                      .toList(),
-            ),
-            const SizedBox(height: 24),
-            Text('Projects', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            ...(user['projects'] as List<String>)
-                .map(
-                  (project) => ListTile(
-                    leading: const Icon(Icons.work),
-                    title: Text(project),
-                  ),
-                )
-                .toList(),
-            const SizedBox(height: 24),
-            Text('Social Links', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
-            ...(user['socialLinks'] as Map<String, String>).entries
-                .map(
-                  (entry) => ListTile(
-                    leading: Icon(
-                      entry.key == 'GitHub' ? Icons.code : Icons.link,
-                    ),
-                    title: Text(entry.key),
-                    subtitle: Text(entry.value),
-                  ),
-                )
-                .toList(),
-          ],
         ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Profile Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'John Doe',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.headlineSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            'john.doe@example.com',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge?.copyWith(
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'Learner',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.white),
+                      onPressed: () {
+                        // TODO: Implement edit profile
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Profile Stats
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildStatItem(context, 'Courses', '12'),
+                    _buildStatItem(context, 'Completed', '8'),
+                    _buildStatItem(context, 'Certificates', '5'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Profile Sections
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Account Settings',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 20),
+                        _buildProfileSection(
+                          context,
+                          'Personal Information',
+                          Icons.person_outline,
+                          () {
+                            // TODO: Navigate to personal info
+                          },
+                        ),
+                        _buildProfileSection(
+                          context,
+                          'Security',
+                          Icons.security,
+                          () {
+                            // TODO: Navigate to security
+                          },
+                        ),
+                        _buildProfileSection(
+                          context,
+                          'Notifications',
+                          Icons.notifications_outlined,
+                          () {
+                            // TODO: Navigate to notifications
+                          },
+                        ),
+                        _buildProfileSection(
+                          context,
+                          'Privacy',
+                          Icons.privacy_tip_outlined,
+                          () {
+                            // TODO: Navigate to privacy
+                          },
+                        ),
+                        _buildProfileSection(
+                          context,
+                          'Help & Support',
+                          Icons.help_outline,
+                          () {
+                            // TODO: Navigate to help
+                          },
+                        ),
+                        _buildProfileSection(
+                          context,
+                          'About',
+                          Icons.info_outline,
+                          () {
+                            // TODO: Navigate to about
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // TODO: Implement logout
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileSection(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       ),
     );
   }

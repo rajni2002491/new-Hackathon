@@ -11,196 +11,246 @@ class FindCollaboratorsScreen extends StatefulWidget {
 
 class _FindCollaboratorsScreenState extends State<FindCollaboratorsScreen> {
   final _searchController = TextEditingController();
-  String _selectedRole = 'All';
-  final List<String> _roles = ['All', 'Learner', 'Builder', 'Mentor'];
-  final List<String> _selectedSkills = [];
+  String _selectedFilter = 'All';
+  final List<String> _filters = ['All', 'Learners', 'Mentors', 'Admins'];
 
-  // Dummy data for skill suggestions
-  final List<String> _skillSuggestions = [
-    'Flutter',
-    'React',
-    'Node.js',
-    'Python',
-    'Java',
-    'UI/UX Design',
-    'Project Management',
-    'Data Science',
-    'Machine Learning',
-    'Cloud Computing',
-    'DevOps',
-  ];
-
-  // Dummy user data
-  final List<Map<String, dynamic>> _users = [
-    {
-      'id': '1',
-      'name': 'John Doe',
-      'role': 'Builder',
-      'skills': ['Flutter', 'React', 'Node.js'],
-      'bio': 'Full-stack developer with 5 years of experience',
-    },
-    {
-      'id': '2',
-      'name': 'Jane Smith',
-      'role': 'Mentor',
-      'skills': ['Python', 'Data Science', 'Machine Learning'],
-      'bio': 'Data scientist and ML engineer, passionate about teaching',
-    },
-    {
-      'id': '3',
-      'name': 'Mike Johnson',
-      'role': 'Learner',
-      'skills': ['UI/UX Design', 'React'],
-      'bio': 'UI/UX designer learning frontend development',
-    },
-  ];
-
-  List<Map<String, dynamic>> get _filteredUsers {
-    return _users.where((user) {
-      final matchesSearch =
-          user['name'].toString().toLowerCase().contains(
-            _searchController.text.toLowerCase(),
-          ) ||
-          user['skills'].toString().toLowerCase().contains(
-            _searchController.text.toLowerCase(),
-          );
-      final matchesRole =
-          _selectedRole == 'All' || user['role'] == _selectedRole;
-      final matchesSkills =
-          _selectedSkills.isEmpty ||
-          _selectedSkills.any(
-            (skill) => (user['skills'] as List<String>).contains(skill),
-          );
-      return matchesSearch && matchesRole && matchesSkills;
-    }).toList();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Find Collaborators')),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search by name or skills...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.secondary,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Search and Filter Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    // Search Bar
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search collaborators...',
+                          prefixIcon: const Icon(Icons.search),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 15,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  onChanged: (value) => setState(() {}),
-                ),
-                const SizedBox(height: 16),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children:
-                        _roles
-                            .map(
-                              (role) => Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: ChoiceChip(
-                                  label: Text(role),
-                                  selected: _selectedRole == role,
+                    const SizedBox(height: 15),
+                    // Filter Chips
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children:
+                            _filters.map((filter) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  label: Text(filter),
+                                  selected: _selectedFilter == filter,
                                   onSelected: (selected) {
                                     setState(() {
-                                      _selectedRole = role;
+                                      _selectedFilter = filter;
                                     });
                                   },
+                                  backgroundColor: Colors.white,
+                                  selectedColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  labelStyle: TextStyle(
+                                    color:
+                                        _selectedFilter == filter
+                                            ? Colors.white
+                                            : Colors.black,
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
+                              );
+                            }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Collaborators List
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Filter by Skills',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children:
-                      _skillSuggestions.map((skill) {
-                        final isSelected = _selectedSkills.contains(skill);
-                        return FilterChip(
-                          label: Text(skill),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            setState(() {
-                              if (selected) {
-                                _selectedSkills.add(skill);
-                              } else {
-                                _selectedSkills.remove(skill);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredUsers.length,
-              itemBuilder: (context, index) {
-                final user = _filteredUsers[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(child: Text(user['name'][0])),
-                    title: Text(user['name']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(user['role']),
-                        Wrap(
-                          spacing: 4,
-                          children:
-                              (user['skills'] as List<String>)
-                                  .map(
-                                    (skill) => Chip(
-                                      label: Text(skill),
-                                      backgroundColor:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.primaryContainer,
-                                      visualDensity: VisualDensity.compact,
-                                    ),
-                                  )
-                                  .toList(),
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      Text(
+                        'Suggested Collaborators',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserProfileScreen(user: user),
-                          ),
-                        );
-                      },
-                      child: const Text('View Profile'),
-                    ),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildCollaboratorCard(
+                        context,
+                        'Sarah Johnson',
+                        'Mentor',
+                        'Expert in UI/UX Design',
+                        Icons.design_services,
+                      ),
+                      _buildCollaboratorCard(
+                        context,
+                        'Mike Chen',
+                        'Learner',
+                        'Full Stack Development',
+                        Icons.code,
+                      ),
+                      _buildCollaboratorCard(
+                        context,
+                        'Emily Brown',
+                        'Admin',
+                        'Project Management',
+                        Icons.manage_accounts,
+                      ),
+                      _buildCollaboratorCard(
+                        context,
+                        'Alex Kumar',
+                        'Mentor',
+                        'Mobile App Development',
+                        Icons.phone_android,
+                      ),
+                      _buildCollaboratorCard(
+                        context,
+                        'Lisa Wang',
+                        'Learner',
+                        'Data Science',
+                        Icons.analytics,
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCollaboratorCard(
+    BuildContext context,
+    String name,
+    String role,
+    String expertise,
+    IconData icon,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(15),
+        leading: CircleAvatar(
+          radius: 25,
+          backgroundColor: Theme.of(
+            context,
+          ).colorScheme.primary.withOpacity(0.1),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        ),
+        title: Text(
+          name,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 5),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                role,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              expertise,
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            ),
+          ],
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            // TODO: Implement connect action
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          child: const Text(
+            'Connect',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
     );
   }
