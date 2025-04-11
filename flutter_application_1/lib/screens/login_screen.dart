@@ -26,31 +26,54 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-      try {
-        await _authService.signInWithEmailAndPassword(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      final userCredential = await _authService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (userCredential.user != null) {
+        if (mounted) {
+          // Get user role and navigate accordingly
+          final role = await _authService.getUserRole();
+          if (mounted) {
+            if (role == 'mentor') {
+              Navigator.pushReplacementNamed(context, '/mentor');
+            } else if (role == 'mentee') {
+              Navigator.pushReplacementNamed(context, '/mentee');
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Invalid user role'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
         );
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(e.toString())));
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -78,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Icon(Icons.school, size: 80, color: Colors.white),
                     const SizedBox(height: 32),
                     const Text(
-                      'Welcome Back!',
+                      'Welcome Back',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -130,9 +153,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your password';
                               }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
-                              }
                               return null;
                             },
                           ),
@@ -169,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushNamed(context, '/signup');
                       },
                       child: const Text(
-                        "Don't have an account? Sign Up",
+                        'Don\'t have an account? Sign Up',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),

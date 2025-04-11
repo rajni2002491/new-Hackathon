@@ -18,37 +18,62 @@ class _SignupScreenState extends State<SignupScreen> {
   final _authService = FirebaseAuthService();
 
   Future<void> _handleSignup() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (!_formKey.currentState!.validate()) {
+      print('Form validation failed');
+      return;
+    }
 
-      try {
-        final userCredential = await _authService.signUpWithEmailAndPassword(
-          _emailController.text.trim(),
-          _passwordController.text.trim(),
-        );
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Passwords do not match'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-        await _authService.createUserDocument(
-          userCredential.user!,
-          _nameController.text.trim(),
-        );
+    setState(() {
+      _isLoading = true;
+    });
 
+    try {
+      print('Starting signup process...');
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      final name = _nameController.text.trim();
+
+      print('Attempting to create account for: $email');
+      final userCredential = await _authService.signUpWithEmailAndPassword(
+        email: email,
+        password: password,
+        name: name,
+      );
+
+      if (userCredential.user != null) {
+        print('Signup successful, navigating to home screen');
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/home');
         }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(e.toString())));
-        }
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
+      } else {
+        throw 'Failed to create user account';
+      }
+    } catch (e) {
+      print('Error during signup: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
