@@ -70,7 +70,7 @@ class ProfileScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'John Doe',
+                            'Ramesh',
                             style: Theme.of(
                               context,
                             ).textTheme.headlineSmall?.copyWith(
@@ -80,7 +80,7 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 5),
                           Text(
-                            'john.doe@example.com',
+                            'ramesh@example.com',
                             style: Theme.of(
                               context,
                             ).textTheme.bodyLarge?.copyWith(
