@@ -90,7 +90,7 @@ class HomeContent extends StatelessWidget {
               ),
             ),
             child: const CircleAvatar(
-              radius: 16,
+              radius: 28,
               backgroundImage: NetworkImage(
                 'https://photosbook.in/wp-content/uploads/stylish-cartoon-boy-dp16.jpg',
               ),
@@ -237,44 +237,84 @@ class HomeContent extends StatelessWidget {
   }
 
   Widget _buildQuickActions(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Actions',
-          style: Theme.of(
-            context,
-          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildActionButton(
-              context,
-              Icons.add_circle_outline,
-              'New Project',
-              () {
-                // TODO: Navigate to new project
-              },
-            ),
-            _buildActionButton(
-              context,
-              Icons.person_add_outlined,
-              'Find Mentor',
-              () {
-                // TODO: Navigate to find mentor
-              },
-            ),
-            _buildActionButton(context, Icons.group_add_outlined, 'Invite', () {
-              // TODO: Navigate to invite collaborators
-            }),
-            _buildActionButton(context, Icons.school_outlined, 'Learn', () {
-              // TODO: Navigate to learning resources
-            }),
-          ],
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Quick Actions',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // TODO: Show all actions
+                },
+                child: const Text('View All'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildActionButton(
+                context,
+                Icons.add_circle_outline,
+                'New Project',
+                Colors.blue,
+                () {
+                  // TODO: Navigate to new project
+                },
+              ),
+              _buildActionButton(
+                context,
+                Icons.person_add_outlined,
+                'Find Mentor',
+                Colors.green,
+                () {
+                  // TODO: Navigate to find mentor
+                },
+              ),
+              _buildActionButton(
+                context,
+                Icons.group_add_outlined,
+                'Invite',
+                Colors.orange,
+                () {
+                  // TODO: Navigate to invite collaborators
+                },
+              ),
+              _buildActionButton(
+                context,
+                Icons.school_outlined,
+                'Learn',
+                Colors.purple,
+                () {
+                  // TODO: Navigate to learning resources
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -282,35 +322,40 @@ class HomeContent extends StatelessWidget {
     BuildContext context,
     IconData icon,
     String label,
+    Color color,
     VoidCallback onTap,
   ) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 80,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-            ),
-          ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: 70,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey[800],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -342,7 +387,7 @@ class HomeContent extends StatelessWidget {
           height: 180,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: 3,
+            itemCount: 5,
             itemBuilder: (context, index) {
               final projects = [
                 {
@@ -359,6 +404,16 @@ class HomeContent extends StatelessWidget {
                   'title': 'UI/UX Design',
                   'progress': 0.9,
                   'color': Colors.purple,
+                },
+                {
+                  'title': 'Data Analytics Dashboard',
+                  'progress': 0.6,
+                  'color': Colors.orange,
+                },
+                {
+                  'title': 'E-Learning Platform',
+                  'progress': 0.3,
+                  'color': Colors.teal,
                 },
               ];
 
@@ -465,21 +520,24 @@ class HomeContent extends StatelessWidget {
                 'name': 'Dr. Sarah Johnson',
                 'title': 'Senior Software Engineer',
                 'company': 'Tech Solutions Inc.',
-                'image': 'https://static.vecteezy.com/system/resources/thumbnails/028/794/707/small_2x/cartoon-cute-school-boy-photo.jpg',
+                'image':
+                    'https://static.vecteezy.com/system/resources/thumbnails/028/794/707/small_2x/cartoon-cute-school-boy-photo.jpg',
                 'expertise': ['Flutter', 'Mobile Development', 'UI/UX'],
               },
               {
                 'name': 'Michael Chen',
                 'title': 'Lead Developer',
                 'company': 'Innovation Labs',
-                'image': 'https://static.vecteezy.com/system/resources/thumbnails/034/210/204/small_2x/3d-cartoon-baby-genius-photo.jpg',
+                'image':
+                    'https://static.vecteezy.com/system/resources/thumbnails/034/210/204/small_2x/3d-cartoon-baby-genius-photo.jpg',
                 'expertise': ['Web Development', 'Cloud Computing', 'AWS'],
               },
               {
                 'name': 'Emily Rodriguez',
                 'title': 'UX Designer',
                 'company': 'Design Studio',
-                'image': 'https://static.vecteezy.com/system/resources/thumbnails/034/210/207/small/3d-cartoon-baby-genius-photo.jpg',
+                'image':
+                    'https://static.vecteezy.com/system/resources/thumbnails/034/210/207/small/3d-cartoon-baby-genius-photo.jpg',
                 'expertise': ['UI/UX', 'Figma', 'Prototyping'],
               },
             ];

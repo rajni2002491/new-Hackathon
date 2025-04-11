@@ -8,430 +8,478 @@ class FindMentorScreen extends StatefulWidget {
 }
 
 class _FindMentorScreenState extends State<FindMentorScreen> {
-  String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Available', 'Top Rated'];
   final TextEditingController _searchController = TextEditingController();
+  String _selectedFilter = 'All';
+  final List<String> _filters = [
+    'All',
+    'Technology',
+    'Business',
+    'Design',
+    'Science',
+  ];
+  bool _isSearching = false;
 
-  // Dummy mentor data
   final List<Map<String, dynamic>> _mentors = [
     {
-      'id': '1',
-      'name': 'Dr. Sarah Johnson',
-      'title': 'Senior Software Engineer',
-      'company': 'Google',
-      'expertise': ['Flutter', 'Mobile Development', 'UI/UX'],
-      'rating': 4.8,
-      'reviews': 128,
+      'name': 'Dr. Sarah Chen',
+      'role': 'Senior Software Architect',
+      'expertise': ['Cloud Architecture', 'System Design', 'AWS'],
+      'image': 'https://randomuser.me/api/portraits/women/44.jpg',
       'availability': 'Available',
-      'image': 'https://randomuser.me/api/portraits/women/1.jpg',
-      'bio':
-          '10+ years of experience in mobile development. Specialized in Flutter and cross-platform solutions.',
-      'hourlyRate': 75,
-    },
-    {
-      'id': '2',
-      'name': 'Prof. Michael Chen',
-      'title': 'Technical Lead',
-      'company': 'Microsoft',
-      'expertise': ['Cloud Computing', 'AWS', 'System Design'],
       'rating': 4.9,
-      'reviews': 256,
-      'availability': 'Available',
-      'image': 'https://randomuser.me/api/portraits/men/2.jpg',
+      'experience': '15 years',
+      'company': 'Google',
       'bio':
-          'Cloud architecture expert with 15 years of experience. Certified AWS Solutions Architect.',
-      'hourlyRate': 90,
+          'Experienced software architect specializing in cloud solutions and distributed systems.',
     },
     {
-      'id': '3',
-      'name': 'Lisa Rodriguez',
-      'title': 'Senior Product Manager',
-      'company': 'Amazon',
-      'expertise': ['Product Strategy', 'Agile', 'User Research'],
-      'rating': 4.7,
-      'reviews': 95,
-      'availability': 'Limited',
-      'image': 'https://randomuser.me/api/portraits/women/3.jpg',
+      'name': 'Prof. James Wilson',
+      'role': 'Data Science Lead',
+      'expertise': ['Machine Learning', 'Python', 'Big Data'],
+      'image': 'https://randomuser.me/api/portraits/men/32.jpg',
+      'availability': 'Busy',
+      'rating': 4.8,
+      'experience': '12 years',
+      'company': 'Microsoft',
       'bio':
-          'Product management expert with focus on user-centered design and agile methodologies.',
-      'hourlyRate': 85,
+          'Leading expert in machine learning and data science with multiple research publications.',
+    },
+    {
+      'name': 'Lisa Anderson',
+      'role': 'UX Design Director',
+      'expertise': ['UI/UX Design', 'Design Systems', 'Figma'],
+      'image': 'https://randomuser.me/api/portraits/women/68.jpg',
+      'availability': 'Available',
+      'rating': 4.9,
+      'experience': '10 years',
+      'company': 'Apple',
+      'bio':
+          'Award-winning designer with expertise in creating intuitive and beautiful user experiences.',
+    },
+    {
+      'name': 'Dr. Michael Brown',
+      'role': 'AI Research Lead',
+      'expertise': ['Artificial Intelligence', 'Deep Learning', 'TensorFlow'],
+      'image': 'https://randomuser.me/api/portraits/men/67.jpg',
+      'availability': 'Available',
+      'rating': 4.7,
+      'experience': '14 years',
+      'company': 'OpenAI',
+      'bio':
+          'Pioneering researcher in artificial intelligence and machine learning technologies.',
+    },
+    {
+      'name': 'Emma Thompson',
+      'role': 'Product Strategy Director',
+      'expertise': ['Product Management', 'Strategy', 'Innovation'],
+      'image': 'https://randomuser.me/api/portraits/women/33.jpg',
+      'availability': 'Busy',
+      'rating': 4.8,
+      'experience': '11 years',
+      'company': 'Amazon',
+      'bio':
+          'Strategic product leader with a track record of successful product launches.',
     },
   ];
 
-  List<Map<String, dynamic>> get _filteredMentors {
-    if (_selectedFilter == 'All') return _mentors;
-    if (_selectedFilter == 'Available') {
-      return _mentors
-          .where((mentor) => mentor['availability'] == 'Available')
-          .toList();
-    }
-    return _mentors.where((mentor) => mentor['rating'] >= 4.8).toList();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Find Mentor'),
-        elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              Colors.white,
-            ],
-          ),
-        ),
-        child: Column(
-          children: [
-            // Search and Filter Row
-            Container(
-              margin: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  // Search Bar
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search mentors...',
-                          border: InputBorder.none,
-                          icon: Icon(
-                            Icons.search,
-                            color: Theme.of(context).colorScheme.primary,
+      body: CustomScrollView(
+        slivers: [
+          // Custom App Bar with Search
+          SliverAppBar(
+            expandedHeight: 180,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
+                  ),
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Find Your Mentor',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Filter Button
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Connect with industry experts',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Search Bar
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Search mentors...',
+                              prefixIcon: const Icon(Icons.search),
+                              suffixIcon:
+                                  _isSearching
+                                      ? IconButton(
+                                        icon: const Icon(Icons.clear),
+                                        onPressed: () {
+                                          setState(() {
+                                            _searchController.clear();
+                                            _isSearching = false;
+                                          });
+                                        },
+                                      )
+                                      : null,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                _isSearching = value.isNotEmpty;
+                              });
+                            },
+                          ),
                         ),
                       ],
                     ),
-                    child: PopupMenuButton<String>(
-                      icon: Icon(
-                        Icons.filter_list,
-                        color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Filter Chips
+          SliverToBoxAdapter(
+            child: Container(
+              height: 60,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _filters.length,
+                itemBuilder: (context, index) {
+                  final filter = _filters[index];
+                  final isSelected = filter == _selectedFilter;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(
+                        filter,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black87,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
                       ),
-                      onSelected: (value) {
+                      selected: isSelected,
+                      onSelected: (selected) {
                         setState(() {
-                          _selectedFilter = value;
+                          _selectedFilter = filter;
                         });
                       },
-                      itemBuilder:
-                          (context) =>
-                              _filters
-                                  .map(
-                                    (filter) => PopupMenuItem<String>(
-                                      value: filter,
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            _selectedFilter == filter
-                                                ? Icons.radio_button_checked
-                                                : Icons.radio_button_unchecked,
-                                            color:
-                                                _selectedFilter == filter
-                                                    ? Theme.of(
-                                                      context,
-                                                    ).colorScheme.primary
-                                                    : Colors.grey,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(filter),
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Selected Filter Indicator
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  Text(
-                    'Filter: ',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _selectedFilter,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      backgroundColor: Colors.grey[200],
+                      selectedColor: Theme.of(context).colorScheme.primary,
+                      checkmarkColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color:
+                              isSelected
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.grey[300]!,
+                          width: 1,
                         ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.arrow_drop_down,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Mentors List
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: _filteredMentors.length,
-                itemBuilder: (context, index) {
-                  final mentor = _filteredMentors[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(mentor['image']),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      mentor['name'],
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      mentor['title'],
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Text(
-                                      mentor['company'],
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      mentor['availability'] == 'Available'
-                                          ? Colors.green.withOpacity(0.1)
-                                          : Colors.orange.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      mentor['availability'] == 'Available'
-                                          ? Icons.check_circle
-                                          : Icons.access_time,
-                                      size: 16,
-                                      color:
-                                          mentor['availability'] == 'Available'
-                                              ? Colors.green
-                                              : Colors.orange,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      mentor['availability'],
-                                      style: TextStyle(
-                                        color:
-                                            mentor['availability'] ==
-                                                    'Available'
-                                                ? Colors.green
-                                                : Colors.orange,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            mentor['bio'],
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          // Compact Skills Section
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.psychology,
-                                size: 16,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Expertise: ',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  (mentor['expertise'] as List<String>).join(
-                                    ', ',
-                                  ),
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 20,
-                                    color: Colors.amber,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    mentor['rating'].toString(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '(${mentor['reviews']} reviews)',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '\$${mentor['hourlyRate']}/hour',
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // TODO: Implement connect with mentor functionality
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text('Connect with Mentor'),
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   );
                 },
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Mentors List
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final mentor = _mentors[index];
+                final isAvailable = mentor['availability'] == 'Available';
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      // Mentor Info
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Profile Image
+                            Container(
+                              width: 70,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: NetworkImage(mentor['image']),
+                                  fit: BoxFit.cover,
+                                ),
+                                border: Border.all(
+                                  color: Colors.grey[300]!,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            // Name and Role
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          mentor['name'],
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isAvailable
+                                                  ? Colors.green.withOpacity(
+                                                    0.1,
+                                                  )
+                                                  : Colors.orange.withOpacity(
+                                                    0.1,
+                                                  ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          mentor['availability'],
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color:
+                                                isAvailable
+                                                    ? Colors.green[700]
+                                                    : Colors.orange[700],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    mentor['role'],
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${mentor['experience']} • ${mentor['company']}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Bio
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          mentor['bio'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[700],
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Expertise
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(16),
+                            bottomRight: Radius.circular(16),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Expertise',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      size: 16,
+                                      color: Colors.amber[700],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      mentor['rating'].toString(),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children:
+                                  (mentor['expertise'] as List<String>)
+                                      .map(
+                                        (skill) => Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            skill,
+                                            style: TextStyle(
+                                              color:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                            ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // TODO: Implement connect functionality
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Connect with Mentor',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }, childCount: _mentors.length),
+            ),
+          ),
+        ],
       ),
     );
   }
