@@ -16,11 +16,11 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    const ProfileScreen(),
-    const FindCollaboratorsScreen(),
-    const ProjectBoardScreen(),
-    const MentorConnectScreen(),
-    const NotificationsScreen(),
+    const HomeContent(),
+    const Center(child: Text('Projects')),
+    const Center(child: Text('Mentors')),
+    const Center(child: Text('Collaborators')),
+    const Center(child: Text('Notifications')),
   ];
 
   void _onItemTapped(int index) {
@@ -37,16 +37,532 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-          NavigationDestination(icon: Icon(Icons.people), label: 'Find'),
-          NavigationDestination(icon: Icon(Icons.dashboard), label: 'Projects'),
-          NavigationDestination(icon: Icon(Icons.school), label: 'Mentors'),
           NavigationDestination(
-            icon: Icon(Icons.notifications),
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.work_outline),
+            selectedIcon: Icon(Icons.work),
+            label: 'Projects',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.people_outline),
+            selectedIcon: Icon(Icons.people),
+            label: 'Mentors',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.group_outlined),
+            selectedIcon: Icon(Icons.group),
+            label: 'Collaborators',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.notifications_outlined),
+            selectedIcon: Icon(Icons.notifications),
             label: 'Notifications',
           ),
         ],
       ),
+    );
+  }
+}
+
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('EdTech Network'),
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const CircleAvatar(
+              radius: 16,
+              backgroundImage: NetworkImage(
+                'https://randomuser.me/api/portraits/men/1.jpg',
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // TODO: Implement search
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              // TODO: Navigate to notifications
+            },
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWelcomeCard(context),
+              const SizedBox(height: 24),
+              _buildQuickActions(context),
+              const SizedBox(height: 24),
+              _buildRecentProjects(context),
+              const SizedBox(height: 24),
+              _buildRecommendedMentors(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(
+                radius: 30,
+                backgroundImage: NetworkImage(
+                  'https://randomuser.me/api/portraits/men/1.jpg',
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Welcome back,',
+                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Ramesh',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem(context, '12', 'Projects'),
+              _buildStatItem(context, '5', 'Mentors'),
+              _buildStatItem(context, '8', 'Collaborators'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(BuildContext context, String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 14),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Quick Actions',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildActionButton(
+              context,
+              Icons.add_circle_outline,
+              'New Project',
+              () {
+                // TODO: Navigate to new project
+              },
+            ),
+            _buildActionButton(
+              context,
+              Icons.person_add_outlined,
+              'Find Mentor',
+              () {
+                // TODO: Navigate to find mentor
+              },
+            ),
+            _buildActionButton(context, Icons.group_add_outlined, 'Invite', () {
+              // TODO: Navigate to invite collaborators
+            }),
+            _buildActionButton(context, Icons.school_outlined, 'Learn', () {
+              // TODO: Navigate to learning resources
+            }),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 80,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentProjects(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Recent Projects',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+              onPressed: () {
+                // TODO: Navigate to all projects
+              },
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: 3,
+            itemBuilder: (context, index) {
+              final projects = [
+                {
+                  'title': 'Mobile App Development',
+                  'progress': 0.7,
+                  'color': Colors.blue,
+                },
+                {
+                  'title': 'Web Application',
+                  'progress': 0.4,
+                  'color': Colors.green,
+                },
+                {
+                  'title': 'UI/UX Design',
+                  'progress': 0.9,
+                  'color': Colors.purple,
+                },
+              ];
+
+              final project = projects[index];
+
+              return Container(
+                width: 200,
+                margin: const EdgeInsets.only(right: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        project['title'] as String,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: project['progress'] as double,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          project['color'] as Color,
+                        ),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${((project['progress'] as double) * 100).toInt()}% Complete',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      ),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              // TODO: Navigate to project details
+                            },
+                            child: const Text('View Details'),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () {
+                              // TODO: Show project options
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecommendedMentors(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Recommended Mentors',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+              onPressed: () {
+                // TODO: Navigate to all mentors
+              },
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            final mentors = [
+              {
+                'name': 'Dr. Sarah Johnson',
+                'title': 'Senior Software Engineer',
+                'company': 'Tech Solutions Inc.',
+                'image': 'https://randomuser.me/api/portraits/women/1.jpg',
+                'expertise': ['Flutter', 'Mobile Development', 'UI/UX'],
+              },
+              {
+                'name': 'Michael Chen',
+                'title': 'Lead Developer',
+                'company': 'Innovation Labs',
+                'image': 'https://randomuser.me/api/portraits/men/2.jpg',
+                'expertise': ['Web Development', 'Cloud Computing', 'AWS'],
+              },
+              {
+                'name': 'Emily Rodriguez',
+                'title': 'UX Designer',
+                'company': 'Design Studio',
+                'image': 'https://randomuser.me/api/portraits/women/2.jpg',
+                'expertise': ['UI/UX', 'Figma', 'Prototyping'],
+              },
+            ];
+
+            final mentor = mentors[index];
+
+            return Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: NetworkImage(mentor['image'] as String),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            mentor['name'] as String,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            mentor['title'] as String,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            mentor['company'] as String,
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 4,
+                            children: [
+                              for (final skill
+                                  in mentor['expertise'] as List<String>)
+                                Chip(
+                                  label: Text(
+                                    skill,
+                                    style: const TextStyle(fontSize: 10),
+                                  ),
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.1),
+                                  labelStyle: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        // TODO: Navigate to mentor profile
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

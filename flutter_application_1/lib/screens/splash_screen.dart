@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,40 +10,21 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
-      ),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-      ),
-    );
-
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
     _controller.forward();
 
-    // Navigate to login screen after animation
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      }
+    // Navigate to home screen after animation
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacementNamed(context, '/home');
     });
   }
 
@@ -57,38 +37,25 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.secondary,
+            ],
+          ),
+        ),
+        child: Center(
+          child: FadeTransition(
+            opacity: _animation,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Icon
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.school_rounded,
-                    size: 60,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // App Name
+                Icon(Icons.school, size: 100, color: Colors.white),
+                const SizedBox(height: 20),
                 Text(
                   'EdTech Network',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -96,24 +63,11 @@ class _SplashScreenState extends State<SplashScreen>
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                // Tagline
+                const SizedBox(height: 10),
                 Text(
-                  'Learn. Connect. Grow.',
+                  'Connect. Learn. Grow.',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-                const SizedBox(height: 48),
-                // Loading Indicator
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.white.withOpacity(0.8),
-                    ),
-                    strokeWidth: 2,
                   ),
                 ),
               ],
