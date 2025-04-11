@@ -92,7 +92,7 @@ class HomeContent extends StatelessWidget {
             child: const CircleAvatar(
               radius: 16,
               backgroundImage: NetworkImage(
-                'https://randomuser.me/api/portraits/men/1.jpg',
+                'https://photosbook.in/wp-content/uploads/stylish-cartoon-boy-dp16.jpg',
               ),
             ),
           ),

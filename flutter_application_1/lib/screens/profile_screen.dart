@@ -78,10 +78,8 @@ class ProfileScreen extends StatelessWidget {
                     CircleAvatar(
                       radius: 40,
                       backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.person,
-                        size: 50,
-                        color: Theme.of(context).colorScheme.primary,
+                      backgroundImage: NetworkImage(
+                        'https://photosbook.in/wp-content/uploads/stylish-cartoon-boy-dp16.jpg',
                       ),
                     ),
                     const SizedBox(width: 20),

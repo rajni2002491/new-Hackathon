@@ -8,400 +8,427 @@ class FindMentorScreen extends StatefulWidget {
 }
 
 class _FindMentorScreenState extends State<FindMentorScreen> {
-  final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = 'All';
-  final List<String> _selectedSkills = [];
+  final List<String> _filters = ['All', 'Available', 'Top Rated'];
+  final TextEditingController _searchController = TextEditingController();
 
-  final List<String> _availableSkills = [
-    'Flutter',
-    'Mobile Development',
-    'UI/UX',
-    'Cloud Architecture',
-    'DevOps',
-    'AWS',
-    'Product Strategy',
-    'Agile',
-    'User Research',
-    'React',
-    'Node.js',
-    'Python',
-    'Machine Learning',
-  ];
-
+  // Dummy mentor data
   final List<Map<String, dynamic>> _mentors = [
     {
+      'id': '1',
       'name': 'Dr. Sarah Johnson',
       'title': 'Senior Software Engineer',
       'company': 'Google',
       'expertise': ['Flutter', 'Mobile Development', 'UI/UX'],
       'rating': 4.8,
       'reviews': 128,
-      'image': 'https://randomuser.me/api/portraits/women/1.jpg',
       'availability': 'Available',
-      'experience': '8 years',
+      'image': 'https://randomuser.me/api/portraits/women/1.jpg',
+      'bio':
+          '10+ years of experience in mobile development. Specialized in Flutter and cross-platform solutions.',
+      'hourlyRate': 75,
     },
     {
-      'name': 'Michael Chen',
-      'title': 'Tech Lead',
+      'id': '2',
+      'name': 'Prof. Michael Chen',
+      'title': 'Technical Lead',
       'company': 'Microsoft',
-      'expertise': ['Cloud Architecture', 'DevOps', 'AWS'],
+      'expertise': ['Cloud Computing', 'AWS', 'System Design'],
       'rating': 4.9,
       'reviews': 256,
-      'image': 'https://randomuser.me/api/portraits/men/2.jpg',
       'availability': 'Available',
-      'experience': '10 years',
+      'image': 'https://randomuser.me/api/portraits/men/2.jpg',
+      'bio':
+          'Cloud architecture expert with 15 years of experience. Certified AWS Solutions Architect.',
+      'hourlyRate': 90,
     },
     {
-      'name': 'Emily Rodriguez',
-      'title': 'Product Manager',
-      'company': 'Apple',
+      'id': '3',
+      'name': 'Lisa Rodriguez',
+      'title': 'Senior Product Manager',
+      'company': 'Amazon',
       'expertise': ['Product Strategy', 'Agile', 'User Research'],
       'rating': 4.7,
-      'reviews': 89,
+      'reviews': 95,
+      'availability': 'Limited',
       'image': 'https://randomuser.me/api/portraits/women/3.jpg',
-      'availability': 'Busy',
-      'experience': '6 years',
+      'bio':
+          'Product management expert with focus on user-centered design and agile methodologies.',
+      'hourlyRate': 85,
     },
   ];
 
   List<Map<String, dynamic>> get _filteredMentors {
-    if (_selectedSkills.isEmpty) return _mentors;
-    return _mentors.where((mentor) {
-      final expertise = List<String>.from(mentor['expertise']);
-      return _selectedSkills.any((skill) => expertise.contains(skill));
-    }).toList();
+    if (_selectedFilter == 'All') return _mentors;
+    if (_selectedFilter == 'Available') {
+      return _mentors
+          .where((mentor) => mentor['availability'] == 'Available')
+          .toList();
+    }
+    return _mentors.where((mentor) => mentor['rating'] >= 4.8).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: true,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Find Mentor',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.secondary,
-                    ],
-                  ),
-                ),
-              ),
-            ),
+      appBar: AppBar(
+        title: const Text('Find Mentor'),
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Colors.white,
+            ],
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        child: Column(
+          children: [
+            // Search and Filter Row
+            Container(
+              margin: const EdgeInsets.all(16),
+              child: Row(
                 children: [
                   // Search Bar
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search mentors...',
-                        prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search mentors...',
+                          border: InputBorder.none,
+                          icon: Icon(
+                            Icons.search,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-
-                  // Filters
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildFilterChip('All'),
-                        _buildFilterChip('Available Now'),
-                        _buildFilterChip('Top Rated'),
-                        _buildFilterChip('Most Experienced'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Skills Filter Section
-                  Text(
-                    'Filter by Skills',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children:
-                        _availableSkills.map((skill) {
-                          final isSelected = _selectedSkills.contains(skill);
-                          return FilterChip(
-                            label: Text(skill),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  _selectedSkills.add(skill);
-                                } else {
-                                  _selectedSkills.remove(skill);
-                                }
-                              });
-                            },
-                            backgroundColor: Colors.grey[100],
-                            selectedColor: Theme.of(
-                              context,
-                            ).colorScheme.primary.withOpacity(0.2),
-                            checkmarkColor:
-                                Theme.of(context).colorScheme.primary,
-                            labelStyle: TextStyle(
-                              color:
-                                  isSelected
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Colors.grey[800],
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          );
-                        }).toList(),
-                  ),
-                  if (_selectedSkills.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${_selectedSkills.length} skills selected',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedSkills.clear();
-                            });
-                          },
-                          child: const Text('Clear All'),
+                  const SizedBox(width: 8),
+                  // Filter Button
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
-                  ],
-                  const SizedBox(height: 24),
-
-                  // Mentors List
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _filteredMentors.length,
-                    itemBuilder: (context, index) {
-                      final mentor = _filteredMentors[index];
-                      return _buildMentorCard(mentor);
-                    },
+                    child: PopupMenuButton<String>(
+                      icon: Icon(
+                        Icons.filter_list,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      onSelected: (value) {
+                        setState(() {
+                          _selectedFilter = value;
+                        });
+                      },
+                      itemBuilder:
+                          (context) =>
+                              _filters
+                                  .map(
+                                    (filter) => PopupMenuItem<String>(
+                                      value: filter,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            _selectedFilter == filter
+                                                ? Icons.radio_button_checked
+                                                : Icons.radio_button_unchecked,
+                                            color:
+                                                _selectedFilter == filter
+                                                    ? Theme.of(
+                                                      context,
+                                                    ).colorScheme.primary
+                                                    : Colors.grey,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(filter),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildFilterChip(String label) {
-    final isSelected = _selectedFilter == label;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: FilterChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (selected) {
-          setState(() {
-            _selectedFilter = selected ? label : 'All';
-          });
-        },
-        backgroundColor: Colors.grey[100],
-        selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-        checkmarkColor: Theme.of(context).colorScheme.primary,
-        labelStyle: TextStyle(
-          color:
-              isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey[800],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMentorCard(Map<String, dynamic> mentor) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(mentor['image']),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        mentor['name'],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        mentor['title'],
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                      ),
-                      Text(
-                        mentor['company'],
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        mentor['availability'] == 'Available'
-                            ? Colors.green[100]
-                            : Colors.orange[100],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    mentor['availability'],
+            // Selected Filter Indicator
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Filter: ',
                     style: TextStyle(
-                      color:
-                          mentor['availability'] == 'Available'
-                              ? Colors.green[800]
-                              : Colors.orange[800],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children:
-                  mentor['expertise'].map<Widget>((skill) {
-                    final isSelected = _selectedSkills.contains(skill);
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(
-                                  context,
-                                ).colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        skill,
-                        style: TextStyle(
-                          color:
-                              isSelected
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _selectedFilter,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 20),
-                    const SizedBox(width: 4),
-                    Text(
-                      mentor['rating'].toString(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '(${mentor['reviews']} reviews)',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.work_outline, size: 16, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      mentor['experience'],
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // TODO: Implement connect functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: Theme.of(context).colorScheme.primary,
+                          size: 20,
+                        ),
+                      ],
                     ),
                   ),
-                  child: const Text('Connect'),
-                ),
-              ],
+                ],
+              ),
+            ),
+
+            // Mentors List
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _filteredMentors.length,
+                itemBuilder: (context, index) {
+                  final mentor = _filteredMentors[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: NetworkImage(mentor['image']),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      mentor['name'],
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      mentor['title'],
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Text(
+                                      mentor['company'],
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      mentor['availability'] == 'Available'
+                                          ? Colors.green.withOpacity(0.1)
+                                          : Colors.orange.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      mentor['availability'] == 'Available'
+                                          ? Icons.check_circle
+                                          : Icons.access_time,
+                                      size: 16,
+                                      color:
+                                          mentor['availability'] == 'Available'
+                                              ? Colors.green
+                                              : Colors.orange,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      mentor['availability'],
+                                      style: TextStyle(
+                                        color:
+                                            mentor['availability'] ==
+                                                    'Available'
+                                                ? Colors.green
+                                                : Colors.orange,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mentor['bio'],
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Compact Skills Section
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.psychology,
+                                size: 16,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Expertise: ',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  (mentor['expertise'] as List<String>).join(
+                                    ', ',
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    size: 20,
+                                    color: Colors.amber,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    mentor['rating'].toString(),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '(${mentor['reviews']} reviews)',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '\$${mentor['hourlyRate']}/hour',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // TODO: Implement connect with mentor functionality
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text('Connect with Mentor'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
