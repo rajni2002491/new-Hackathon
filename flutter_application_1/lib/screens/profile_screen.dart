@@ -92,7 +92,7 @@ class ProfileScreen extends StatelessWidget {
                             style: Theme.of(
                               context,
                             ).textTheme.headlineSmall?.copyWith(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -102,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                             style: Theme.of(
                               context,
                             ).textTheme.bodyLarge?.copyWith(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.black.withOpacity(0.8),
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -118,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
                             child: Text(
                               'Learner',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontSize: 14,
                               ),
                             ),
