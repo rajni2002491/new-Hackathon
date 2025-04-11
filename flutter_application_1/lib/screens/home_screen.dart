@@ -17,10 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const HomeContent(),
-    const Center(child: Text('Projects')),
-    const Center(child: Text('Mentors')),
-    const Center(child: Text('Collaborators')),
-    const Center(child: Text('Notifications')),
+    const ProjectBoardScreen(),
+    const MentorConnectScreen(),
+    const FindCollaboratorsScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -57,11 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedIcon: Icon(Icons.group),
             label: 'Collaborators',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
         ],
       ),
     );
@@ -86,8 +80,15 @@ class HomeContent extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
+          child: Container(
+            margin: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.5),
+                width: 2,
+              ),
+            ),
             child: const CircleAvatar(
               radius: 16,
               backgroundImage: NetworkImage(
@@ -106,7 +107,12 @@ class HomeContent extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // TODO: Navigate to notifications
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsScreen(),
+                ),
+              );
             },
           ),
         ],

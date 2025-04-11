@@ -25,11 +25,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual login logic
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      // Basic authentication check (replace with actual authentication logic)
+      final email = _emailController.text;
+      final password = _passwordController.text;
+
+      // Demo credentials (replace with actual authentication)
+      if (email == 'demo@example.com' && password == 'password123') {
+        // Successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid email or password'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

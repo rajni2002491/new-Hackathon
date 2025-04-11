@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'profile_setup_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -30,10 +31,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _handleSignUp() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual sign up logic
+      // Basic registration (replace with actual registration logic)
+      final email = _emailController.text;
+      final name = _nameController.text;
+
+      // Navigate to profile setup
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(
+          builder:
+              (context) =>
+                  ProfileSetupScreen(email: email, role: _selectedRole),
+        ),
       );
     }
   }
