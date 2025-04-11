@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/firebase_auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,24 +13,35 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  final _authService = FirebaseAuthService();
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    // Navigate to login screen after animation
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+    // Check authentication state after animation
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        _checkAuthAndNavigate();
+      }
     });
+  }
+
+  Future<void> _checkAuthAndNavigate() async {
+    final user = _authService.currentUser;
+    if (user != null) {
+      // User is signed in, navigate to home
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      // User is not signed in, navigate to login
+      Navigator.pushReplacementNamed(context, '/login');
+    }
   }
 
   @override
@@ -46,10 +58,7 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.secondary,
-            ],
+            colors: [Colors.blue.shade400, Colors.blue.shade900],
           ),
         ),
         child: Center(
@@ -58,21 +67,20 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.school, size: 100, color: Colors.white),
-                const SizedBox(height: 20),
-                Text(
+                const Icon(Icons.school, size: 100, color: Colors.white),
+                const SizedBox(height: 24),
+                const Text(
                   'EdTech Network',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
+                  style: TextStyle(
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Connect. Learn. Grow.',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.8),
-                  ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Connect, Learn, and Grow Together',
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
               ],
             ),

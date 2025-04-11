@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/firebase_auth_service.dart';
 import 'profile_screen.dart';
 import 'find_collaborators_screen.dart';
 import 'project_board_screen.dart';
@@ -13,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _authService = FirebaseAuthService();
+  User? _user;
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -21,6 +25,27 @@ class _HomeScreenState extends State<HomeScreen> {
     const MentorConnectScreen(),
     const FindCollaboratorsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _user = _authService.currentUser;
+  }
+
+  Future<void> _handleSignOut() async {
+    try {
+      await _authService.signOut();
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -31,7 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      appBar: AppBar(
+        title: const Text('EdTech Network'),
+        actions: [
+          IconButton(icon: const Icon(Icons.logout), onPressed: _handleSignOut),
+        ],
+      ),
+      body:
+          _user == null
+              ? const Center(child: CircularProgressIndicator())
+              : _screens[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
