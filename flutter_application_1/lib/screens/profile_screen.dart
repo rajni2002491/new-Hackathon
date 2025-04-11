@@ -36,14 +36,34 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // TODO: Navigate to edit profile screen
+            },
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.secondary,
+              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Colors.white,
             ],
           ),
         ),
@@ -118,32 +138,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
 
-              // Profile Stats
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatItem(context, 'Courses', '12'),
-                    _buildStatItem(context, 'Completed', '8'),
-                    _buildStatItem(context, 'Certificates', '5'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
               // Profile Sections
               Expanded(
                 child: Container(
@@ -158,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
-                        offset: const Offset(0, -5),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
@@ -227,7 +221,7 @@ class ProfileScreen extends StatelessWidget {
                           height: 50,
                           child: ElevatedButton(
                             onPressed: () {
-                              // TODO: Implement logout
+                              _handleLogout(context);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
