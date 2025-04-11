@@ -25,7 +25,7 @@ class _FindCollaboratorsScreenState extends State<FindCollaboratorsScreen> {
       'name': 'Alex Johnson',
       'role': 'UI/UX Designer',
       'skills': ['Figma', 'Adobe XD', 'Prototyping'],
-      'image': 'https://randomuser.me/api/portraits/men/32.jpg',
+      'image': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCVBqlCNAFeBULYf1VWmLr5oQMLqgaZz7aXg&s',
       'availability': 'Available',
       'rating': 4.8,
     },
