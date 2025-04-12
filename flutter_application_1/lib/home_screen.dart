@@ -57,23 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('EdTech Network'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              // Navigate to profile screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProfileScreen(user: _users[0]),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+     
       body: Column(
         children: [
           Padding(

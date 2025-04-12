@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../services/firebase_auth_service.dart';
 import 'profile_screen.dart';
 import 'find_collaborators_screen.dart';
 import 'project_board_screen.dart';
 import 'mentor_connect_screen.dart';
 import 'notifications_screen.dart';
+import 'create_project_screen.dart';
+import 'learning_resources_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +17,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _authService = FirebaseAuthService();
+  User? _user;
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
@@ -21,6 +27,27 @@ class _HomeScreenState extends State<HomeScreen> {
     const MentorConnectScreen(),
     const FindCollaboratorsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _user = _authService.currentUser;
+  }
+
+  Future<void> _handleSignOut() async {
+    try {
+      await _authService.signOut();
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -31,7 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body:
+          _user == null
+              ? const Center(child: CircularProgressIndicator())
+              : _screens[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
@@ -62,47 +92,107 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomeContent extends StatelessWidget {
+class HomeContent extends StatefulWidget {
   const HomeContent({super.key});
+
+  @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+  String _searchQuery = '';
+  bool _showSearchResults = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _startSearch() {
+    setState(() {
+      _isSearching = true;
+      _showSearchResults = true;
+    });
+  }
+
+  void _stopSearch() {
+    setState(() {
+      _isSearching = false;
+      _showSearchResults = false;
+      _searchQuery = '';
+      _searchController.clear();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EdTech Network'),
+        title:
+            _isSearching
+                ? TextField(
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Search projects, mentors...',
+                    hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                    border: InputBorder.none,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                  onChanged: _onSearchChanged,
+                )
+                : const Text('EdTech Network'),
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-            );
-          },
-          child: Container(
-            margin: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withOpacity(0.5),
-                width: 2,
-              ),
-            ),
-            child: const CircleAvatar(
-              radius: 28,
-              backgroundImage: NetworkImage(
-                'https://photosbook.in/wp-content/uploads/stylish-cartoon-boy-dp16.jpg',
-              ),
-            ),
-          ),
-        ),
+        leading:
+            _isSearching
+                ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: _stopSearch,
+                )
+                : GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.5),
+                        width: 2,
+                      ),
+                    ),
+                    child: const CircleAvatar(
+                      radius: 28,
+                      backgroundImage: NetworkImage(
+                        'https://photosbook.in/wp-content/uploads/stylish-cartoon-boy-dp16.jpg',
+                      ),
+                    ),
+                  ),
+                ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implement search
-            },
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: _isSearching ? _stopSearch : _startSearch,
           ),
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -128,21 +218,293 @@ class HomeContent extends StatelessWidget {
             ],
           ),
         ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildWelcomeCard(context),
-              const SizedBox(height: 24),
-              _buildQuickActions(context),
-              const SizedBox(height: 24),
-              _buildRecentProjects(context),
-              const SizedBox(height: 24),
-              _buildRecommendedMentors(context),
-            ],
-          ),
+        child:
+            _showSearchResults
+                ? _buildSearchResults()
+                : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildWelcomeCard(context),
+                      const SizedBox(height: 24),
+                      _buildQuickActions(context),
+                      const SizedBox(height: 24),
+                      _buildRecentProjects(context),
+                      const SizedBox(height: 24),
+                      _buildRecommendedMentors(context),
+                    ],
+                  ),
+                ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    if (_searchQuery.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'Search for projects, mentors, or collaborators',
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
+      );
+    }
+
+    // Filter projects
+    final filteredProjects =
+        [
+              {
+                'title': 'Mobile App Development',
+                'progress': 0.7,
+                'color': Colors.blue,
+              },
+              {
+                'title': 'Web Application',
+                'progress': 0.4,
+                'color': Colors.green,
+              },
+              {
+                'title': 'UI/UX Design',
+                'progress': 0.9,
+                'color': Colors.purple,
+              },
+            ]
+            .where(
+              (project) => project['title'].toString().toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ),
+            )
+            .toList();
+
+    // Filter mentors
+    final filteredMentors =
+        [
+              {
+                'name': 'Dr. Sarah Johnson',
+                'title': 'Senior Software Engineer',
+                'company': 'Tech Solutions Inc.',
+                'image':
+                    'https://static.vecteezy.com/system/resources/thumbnails/028/794/707/small_2x/cartoon-cute-school-boy-photo.jpg',
+                'expertise': ['Flutter', 'Mobile Development', 'UI/UX'],
+              },
+              {
+                'name': 'Michael Chen',
+                'title': 'Lead Developer',
+                'company': 'Innovation Labs',
+                'image':
+                    'https://static.vecteezy.com/system/resources/thumbnails/034/210/204/small_2x/3d-cartoon-baby-genius-photo.jpg',
+                'expertise': ['Web Development', 'Cloud Computing', 'AWS'],
+              },
+            ]
+            .where(
+              (mentor) =>
+                  mentor['name'].toString().toLowerCase().contains(
+                    _searchQuery.toLowerCase(),
+                  ) ||
+                  mentor['expertise'].toString().toLowerCase().contains(
+                    _searchQuery.toLowerCase(),
+                  ),
+            )
+            .toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (filteredProjects.isNotEmpty) ...[
+            Row(
+              children: [
+                Icon(
+                  Icons.work_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Projects',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: filteredProjects.length,
+              itemBuilder: (context, index) {
+                final project = filteredProjects[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          project['title'] as String,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: project['progress'] as double,
+                          backgroundColor: Colors.grey[200],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            project['color'] as Color,
+                          ),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${((project['progress'] as double) * 100).toInt()}% Complete',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+          if (filteredMentors.isNotEmpty) ...[
+            Row(
+              children: [
+                Icon(
+                  Icons.people_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Mentors',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: filteredMentors.length,
+              itemBuilder: (context, index) {
+                final mentor = filteredMentors[index];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: NetworkImage(
+                            mentor['image'] as String,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                mentor['name'] as String,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                mentor['title'] as String,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 4,
+                                runSpacing: 4,
+                                children: [
+                                  for (final skill
+                                      in mentor['expertise'] as List<String>)
+                                    Chip(
+                                      label: Text(
+                                        skill,
+                                        style: const TextStyle(fontSize: 10),
+                                      ),
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.1),
+                                      labelStyle: TextStyle(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+          if (filteredProjects.isEmpty && filteredMentors.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No results found for "$_searchQuery"',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -281,7 +643,12 @@ class HomeContent extends StatelessWidget {
                 'New Project',
                 Colors.blue,
                 () {
-                  // TODO: Navigate to new project
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CreateProjectScreen(),
+                    ),
+                  );
                 },
               ),
               _buildActionButton(
@@ -290,7 +657,12 @@ class HomeContent extends StatelessWidget {
                 'Find Mentor',
                 Colors.green,
                 () {
-                  // TODO: Navigate to find mentor
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MentorConnectScreen(),
+                    ),
+                  );
                 },
               ),
               _buildActionButton(
@@ -299,7 +671,12 @@ class HomeContent extends StatelessWidget {
                 'Invite',
                 Colors.orange,
                 () {
-                  // TODO: Navigate to invite collaborators
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FindCollaboratorsScreen(),
+                    ),
+                  );
                 },
               ),
               _buildActionButton(
@@ -308,7 +685,12 @@ class HomeContent extends StatelessWidget {
                 'Learn',
                 Colors.purple,
                 () {
-                  // TODO: Navigate to learning resources
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LearningResourcesScreen(),
+                    ),
+                  );
                 },
               ),
             ],

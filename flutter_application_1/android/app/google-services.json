@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "772247576952",
+    "project_id": "mentore-auth",
+    "storage_bucket": "mentore-auth.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:772247576952:android:c1a49a585d1a3c96fe688d",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCe6arf5jiKYqaPU3WKClumHuRfs2cSvko"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'mentorship_request_screen.dart';
 import 'user_profile_screen.dart';
 
 class MentorConnectScreen extends StatefulWidget {
@@ -31,23 +32,45 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
   final List<Map<String, dynamic>> _mentors = [
     {
       'id': '1',
-      'name': 'Jane Smith',
-      'role': 'Mentor',
-      'skills': ['Python', 'Data Science', 'Machine Learning'],
+      'name': 'Dr. Sarah Johnson',
+      'title': 'Senior Software Engineer',
+      'company': 'Tech Solutions Inc.',
+      'image':
+          'https://static.vecteezy.com/system/resources/thumbnails/028/794/707/small_2x/cartoon-cute-school-boy-photo.jpg',
+      'skills': ['Flutter', 'Mobile Development', 'UI/UX'],
       'bio':
-          'Data scientist and ML engineer with 10 years of experience. Passionate about teaching and mentoring.',
-      'availability': 'Weekdays, 6 PM - 9 PM',
+          'Experienced software engineer with 10+ years in mobile development. Passionate about mentoring and helping others grow.',
+      'availability': 'Available',
       'rating': 4.8,
+      'type': 'individual',
     },
     {
       'id': '2',
-      'name': 'Mike Johnson',
-      'role': 'Mentor',
-      'skills': ['UI/UX Design', 'React', 'Project Management'],
+      'name': 'Innovation Labs',
+      'title': 'Tech Education Organization',
+      'company': 'Innovation Labs Inc.',
+      'image':
+          'https://static.vecteezy.com/system/resources/thumbnails/034/210/204/small_2x/3d-cartoon-baby-genius-photo.jpg',
+      'skills': ['Web Development', 'Cloud Computing', 'AWS'],
       'bio':
-          'Senior UI/UX designer and frontend developer. Love helping others grow in their design journey.',
-      'availability': 'Weekends, 10 AM - 4 PM',
+          'Leading tech education organization providing mentorship and training programs. Connect with our expert mentors.',
+      'availability': 'Available',
       'rating': 4.9,
+      'type': 'organization',
+    },
+    {
+      'id': '3',
+      'name': 'Emily Rodriguez',
+      'title': 'UX Design Director',
+      'company': 'Design Studio',
+      'image':
+          'https://static.vecteezy.com/system/resources/thumbnails/034/210/207/small/3d-cartoon-baby-genius-photo.jpg',
+      'skills': ['UI/UX', 'Figma', 'Prototyping'],
+      'bio':
+          'Award-winning UX designer with expertise in creating intuitive and beautiful user experiences. Available for mentorship.',
+      'availability': 'Available',
+      'rating': 4.7,
+      'type': 'individual',
     },
   ];
 
@@ -70,9 +93,20 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Find a Mentor')),
+      appBar: AppBar(
+        title: const Text('Find a Mentor'),
+        elevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
       body: Column(
         children: [
           Padding(
@@ -137,7 +171,12 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
                       children: [
                         Row(
                           children: [
-                            CircleAvatar(child: Text(mentor['name'][0])),
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundImage: NetworkImage(
+                                mentor['image'] as String,
+                              ),
+                            ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: Column(
@@ -148,6 +187,23 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
                                     style:
                                         Theme.of(context).textTheme.titleLarge,
                                   ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    mentor['title'],
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    mentor['company'],
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
                                   Row(
                                     children: [
                                       Icon(
@@ -165,6 +221,34 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
                                             Theme.of(
                                               context,
                                             ).textTheme.bodySmall,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                              .withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          mentor['type'] == 'individual'
+                                              ? 'Individual Mentor'
+                                              : 'Organization',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.primary,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -194,17 +278,6 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
                         ),
                         const SizedBox(height: 16),
                         Row(
-                          children: [
-                            const Icon(Icons.access_time, size: 16),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Available: ${mentor['availability']}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             ElevatedButton.icon(
@@ -223,7 +296,15 @@ class _MentorConnectScreenState extends State<MentorConnectScreen> {
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
-                                // TODO: Implement mentorship request
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => MentorshipRequestScreen(
+                                          mentor: mentor,
+                                        ),
+                                  ),
+                                );
                               },
                               icon: const Icon(Icons.school),
                               label: const Text('Request Mentorship'),
